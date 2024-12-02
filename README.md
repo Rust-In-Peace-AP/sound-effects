@@ -4,7 +4,7 @@ In this repository you will find all the sound-effects, divided in categories, f
 
 ---
 
-In the [categories](#categories) section, you'll find two directories:
+In the [categories](https://github.com/Rust-In-Peace-AP/sound-effects/tree/main/categories) section, you'll find two directories:
 
 - Success
   - That you can use for the successful operations.
