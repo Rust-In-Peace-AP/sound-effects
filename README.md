@@ -8,7 +8,7 @@ In the [categories](#categories) section, you'll find two directories:
 
 - Success
   - That you can use for the successful operations.
-- Error
+- Fail
   - For the failed operations.
 
 In each directory you will also find many sub-categories where the sound effects have
