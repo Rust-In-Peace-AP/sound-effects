@@ -72,6 +72,8 @@ impl MyDrone {
     }
     fn handle_command(&mut self, command: DroneCommand) {
         match command {
+            //TO DO: aggiungere la condivisione felle modifiche tramite flood response al resto della rete!!!!!!!
+            //per tutti i metodi
             DroneCommand::AddSender(node_id, sender) => {
                 self.packet_send.insert(node_id, sender);
             },
