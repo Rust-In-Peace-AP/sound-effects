@@ -148,6 +148,8 @@ impl MyDrone {
         // In case of Nack, Ack, FloodRequest, FloodResponse the drone will forward
         // the packet through the SC
         match &packet.pack_type {
+
+            // Don't need to do pattern matching on Ack and Nack cause you just need to forward them
             PacketType::Nack(_nack) => {
 
                 if let Some(sender) = self.packet_send.get(&next_hop) {
@@ -155,9 +157,6 @@ impl MyDrone {
                         eprintln!("Failed to send packet: {:?}", e);
                     }
                 }
-
-                return;
-
             },
             PacketType::Ack(_ack) => {
 
@@ -166,13 +165,14 @@ impl MyDrone {
                         eprintln!("Failed to send packet: {:?}", e);
                     }
                 }
-
-                return;
             },
+
             PacketType::MsgFragment(_fragment) => {
 
+                // Controllo per simulare la perdita di pacchetti
                 let pdr = self.pdr;
                 let random = rand::random::<f32>();
+
                 if random > pdr {
 
                     if let Some(sender) = self.packet_send.get(&next_hop) {
@@ -181,9 +181,9 @@ impl MyDrone {
                         }
                     }
 
-                    return;
                 } else {
 
+                    // Creating the nack packet with reversed routing header
                     let nack_packet = self.create_nack_packet(&packet.routing_header.hops, new_hop_index.clone(), NackType::Dropped, packet.session_id);
 
                     if let Some(sender) = self.packet_send.get(&packet.routing_header.hops[new_hop_index-1]) {
@@ -193,6 +193,7 @@ impl MyDrone {
                     }
                 }
             },
+
             PacketType::FloodRequest(_flood_request) => todo!(),
             PacketType::FloodResponse(_flood_response) => todo!(),
         }
