@@ -148,9 +148,26 @@ impl MyDrone {
         // In case of Nack, Ack, FloodRequest, FloodResponse the drone will forward
         // the packet through the SC
         match &packet.pack_type {
-            PacketType::Nack(_nack) => { todo!()
+            PacketType::Nack(_nack) => {
+
+                if let Some(sender) = self.packet_send.get(&next_hop) {
+                    if let Err(e) = sender.send(packet) {
+                        eprintln!("Failed to send packet: {:?}", e);
+                    }
+                }
+
+                return;
+
             },
-            PacketType::Ack(_ack) => {  todo!()
+            PacketType::Ack(_ack) => {
+
+                if let Some(sender) = self.packet_send.get(&next_hop) {
+                    if let Err(e) = sender.send(packet) {
+                        eprintln!("Failed to send packet: {:?}", e);
+                    }
+                }
+
+                return;
             },
             PacketType::MsgFragment(_fragment) => {
 
@@ -158,19 +175,22 @@ impl MyDrone {
                 let random = rand::random::<f32>();
                 if random > pdr {
 
-                    self.packet_send(next_hop, packet);
+                    if let Some(sender) = self.packet_send.get(&next_hop) {
+                        if let Err(e) = sender.send(packet) {
+                            eprintln!("Failed to send packet: {:?}", e);
+                        }
+                    }
+
+                    return;
                 } else {
 
-                    let nack_packet = Packet {
-                        pack_type: PacketType::Nack(Nack {
-                            fragment_index: 0,
-                            nack_type: NackType::Dropped,
-                        }),
-                        routing_header: reverse_routing_header.clone(),
-                        session_id: packet.session_id,
-                    };
+                    let nack_packet = self.create_nack_packet(&packet.routing_header.hops, new_hop_index.clone(), NackType::Dropped, packet.session_id);
 
-                    self.packet_send(reverse_routing_header.hops[reverse_routing_header.hop_index + 1], nack_packet);
+                    if let Some(sender) = self.packet_send.get(&packet.routing_header.hops[new_hop_index-1]) {
+                        if let Err(e) = sender.send(nack_packet) {
+                            eprintln!("Failed to send NACK packet: {:?}", e);
+                        }
+                    }
                 }
             },
             PacketType::FloodRequest(_flood_request) => todo!(),
