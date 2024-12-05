@@ -8,8 +8,9 @@ use wg_2024::config::Config;
 use wg_2024::controller::{DroneCommand, DroneEvent};
 use wg_2024::drone::Drone;
 use wg_2024::network::{NodeId, SourceRoutingHeader};
-use wg_2024::packet::{NackType, Nack, Packet, PacketType};
+use wg_2024::packet::{NackType, Nack, Packet, PacketType, FloodResponse};
 use wg_2024::packet::NackType::UnexpectedRecipient;
+use wg_internal::packet::NodeType;
 
 /// Example of drone implementation
 struct MyDrone {
@@ -19,6 +20,7 @@ struct MyDrone {
     packet_recv: Receiver<Packet>,
     pdr: f32,
     packet_send: HashMap<NodeId, Sender<Packet>>,
+    flood_ids: Vec<u64>,
 }
 
 impl Drone for MyDrone {
@@ -38,6 +40,7 @@ impl Drone for MyDrone {
             packet_recv,
             packet_send,
             pdr,
+            flood_ids: Vec::new(),
         }
     }
 
@@ -194,15 +197,74 @@ impl MyDrone {
                 }
             },
 
-            PacketType::FloodRequest(_flood_request) => todo!(),
+            PacketType::FloodRequest(mut flood_request) => {
+
+                if self.flood_ids.contains(&flood_request.flood_id) {
+                    // todo!("Implement the floodResponse");
+                    return;
+                }
+                // todo!("Pensa se puoi invertire il path_trace e renderlo il rev_routing_header invece di ruotarlo con la funzione");
+                // Adds the flood id to the list of flood ids
+                self.flood_ids.push(flood_request.flood_id);
+
+                // Adds himself to the path trace
+                flood_request.path_trace.push((self.id, NodeType::Drone));
+
+                // Gets the number of neighbors, if 0 create and send the flood response
+                let ngbhs_count = self.packet_send.len();
+                if ngbhs_count == 0 {
+
+                    let flood_response = FloodResponse {
+                        flood_id: flood_request.flood_id,
+                        path_trace: flood_request.path_trace.clone(),
+                    };
+
+                    let rev_routing_header = reverse_routing_header(&packet.routing_header.hops, new_hop_index);
+
+                    let new_packet = Packet {
+                        pack_type: PacketType::FloodResponse(flood_response),
+                        routing_header: rev_routing_header,
+                        session_id: packet.session_id,
+                    };
+
+                    if let Some(sender) = self.packet_send.get(&new_packet.routing_header.hops[1]) {
+                        if let Err(e) = sender.send(new_packet) {
+                            eprintln!("Failed to send packet: {:?}", e);
+                        }
+                    }
+
+                    return;
+                }
+
+                for (node_id, sender) in self.packet_send.iter() {
+
+                    if *node_id == packet.routing_header.hops[packet.routing_header.hop_index] {
+                        continue;
+                    }
+
+                    let mut new_hops = packet.routing_header.hops.clone();
+                    new_hops.push(*node_id);
+
+                    let new_packet = Packet {
+                        pack_type: PacketType::FloodRequest(flood_request.clone()),
+                        routing_header: SourceRoutingHeader {
+                            hops: new_hops,
+                            hop_index: new_hop_index,
+                        },
+                        session_id: packet.session_id,
+                    };
+
+                    sender.send(new_packet).unwrap();
+                }
+            },
             PacketType::FloodResponse(_flood_response) => todo!(),
         }
     }
 
     fn handle_command(&mut self, command: DroneCommand) {
         match command {
-            DroneCommand::AddSender(_node_id, _sender) => {
-                self.packet_send(_node_id, _sender);
+            DroneCommand::AddSender(node_id, sender) => {
+                self.packet_send.insert(node_id, sender);
             },
             DroneCommand::SetPacketDropRate(_pdr) => todo!(),
             DroneCommand::Crash => unreachable!(),
