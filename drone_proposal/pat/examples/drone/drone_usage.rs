@@ -113,7 +113,7 @@ impl MyDrone {
         let start_hop_index = packet.routing_header.hop_index;
 
         // Checking if the packet is for this drone
-        if packet.routing_header.hops[start_hop_index] != self.id {
+        if packet.routing_header.hops[start_hop_index] != self.id && !&packet.pack_type == PacketType::FloodRequest {
 
             // Creating the nack packet with reversed routing header, hop index incremented because it hasn't been incremented yet and wouldn't split the actual node
             let nack_packet = self.create_nack_packet(&packet.routing_header.hops, start_hop_index+1, UnexpectedRecipient(self.id), packet.session_id);
@@ -151,7 +151,7 @@ impl MyDrone {
         let next_hop = packet.routing_header.hops[new_hop_index];
 
         // Checking if there is a channel to the next hop. So checking if it's a neighbor
-        if self.packet_send.get(&next_hop).is_none() {
+        if self.packet_send.get(&next_hop).is_none() && !&packet.pack_type == PacketType::FloodRequest {
 
             // Creating the nack packet with reversed routing header
             let nack_packet = self.create_nack_packet(&packet.routing_header.hops, new_hop_index.clone(), NackType::ErrorInRouting(next_hop), packet.session_id);
@@ -170,7 +170,7 @@ impl MyDrone {
         match &packet.pack_type {
 
             // Don't need to do pattern matching NackType cause you just need to forward them
-            PacketType::Nack(_nack) | PacketType::Ack(_ack) => {
+            PacketType::Nack(_nack) | PacketType::Ack(_ack) | PacketType::FloodResponse(_flood_response) => {
 
                 self.send_packet(packet, &next_hop);
             },
@@ -198,8 +198,27 @@ impl MyDrone {
 
             PacketType::FloodRequest(mut flood_request) => {
 
-                if self.flood_ids.contains(&flood_request.flood_id) {
-                    // todo!("Implement the floodResponse");
+                if self.flood_ids.contains(&flood_request.flood_id) { // todo!("Check if the flood id is enough")
+
+                    // Creates the routing header reversing the path trace
+                    let routing_header = reverse_routing_header(
+                        &flood_request.path_trace.iter().map(|(node_id, _)| *node_id).cloned().collect::<Vec<NodeId>>(),
+                        new_hop_index + 1);
+
+                    let next_hop = routing_header.hops[1];
+
+                    // Creates and sends the response packet
+                    let response_packet = Packet {
+                        pack_type: PacketType::FloodResponse(FloodResponse {
+                            flood_id: flood_request.flood_id,
+                            path_trace: flood_request.path_trace.clone(),
+                        }),
+                        routing_header,
+                        session_id: packet.session_id,
+                    };
+
+                    self.send_packet(response_packet, &next_hop);
+
                     return;
                 }
 
@@ -209,28 +228,31 @@ impl MyDrone {
                 // Adds himself to the path trace
                 flood_request.path_trace.push((self.id, NodeType::Drone));
 
-                // Gets the number of neighbors, if 0 create and send the flood response
-                let ngbhs_count = self.packet_send.len();
-                if ngbhs_count == 0 {
+                // Filtering the drone that sent the packet from the neighbors of the actual drone
+                let neighbors = self.packet_send.keys().filter(|&node_id| {
+                    !flood_request.path_trace.iter().any(|(id, _)| id == node_id)
+                });
 
-                    let flood_response = FloodResponse {
-                        flood_id: flood_request.flood_id,
-                        path_trace: flood_request.path_trace.clone(),
-                    };
+                // If there are no neighbors, creates the response packet
+                if neighbors.clone().count() == 0 {
 
-                    // Creates the reverse routing header that i populate with the nodeID of every node that gets the FloodRequest
-                    // Look in the next section to see that
+                    // Creates a FloodResponse with the routing header created by reversing the path trace
+                    let response_packet = Packet {
 
-                    let rev_routing_header = reverse_routing_header(&packet.routing_header.hops, new_hop_index + 1);
+                        pack_type: PacketType::FloodResponse(FloodResponse {
+                            flood_id: flood_request.flood_id,
+                            path_trace: flood_request.path_trace.clone(),
+                        }),
 
-                    let new_packet = Packet {
-                        pack_type: PacketType::FloodResponse(flood_response),
-                        routing_header: rev_routing_header,
+                        routing_header: reverse_routing_header(
+                            &flood_request.path_trace.iter().map(|(node_id, _)| *node_id).cloned().collect::<Vec<_>>(),
+                            new_hop_index + 1,
+                        ),
                         session_id: packet.session_id,
                     };
 
                     // Sends the packet to the previous node of the new routing header reversed that is the previous node of the drone
-                    self.send_packet(new_packet.clone(), &new_packet.routing_header.hops[1]);
+                    self.send_packet(response_packet.clone(), &response_packet.routing_header.hops[1]);
 
                     return;
                 }
@@ -239,20 +261,14 @@ impl MyDrone {
                 for (node_id, sender) in self.packet_send.iter() {
 
                     // If the node is the one that sent the packet, skip it
-                    if *node_id == packet.routing_header.hops[packet.routing_header.hop_index] {
+                    if flood_request.path_trace.iter().any(|(id, _)| id == node_id) {
                         continue;
                     }
 
-                    // Add the next node to the routing header of the packet and send it
-                    let mut new_hops = packet.routing_header.hops.clone();
-                    new_hops.push(*node_id);
-
+                    // Send the FloodRequest to the neighbors
                     let new_packet = Packet {
                         pack_type: PacketType::FloodRequest(flood_request.clone()),
-                        routing_header: SourceRoutingHeader {
-                            hops: new_hops,
-                            hop_index: new_hop_index,
-                        },
+                        routing_header: packet.routing_header.clone(),
                         session_id: packet.session_id,
                     };
 
@@ -261,8 +277,6 @@ impl MyDrone {
                     }
                 }
             },
-            
-            PacketType::FloodResponse(_flood_response) => todo!(),
         }
     }
 
