@@ -12,7 +12,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="fcc6c3fe-db00-4640-a6a6-b8518971d65c" name="Changes" comment="" />
+    <list default="true" id="fcc6c3fe-db00-4640-a6a6-b8518971d65c" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -70,7 +72,7 @@
   }
 }]]></component>
   <component name="RustProjectSettings">
-    <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+    <option name="toolchainHomeDirectory" value="$PROJECT_DIR$/../.cargo/bin" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -86,7 +88,7 @@
       <workItem from="1733409291642" duration="5485000" />
       <workItem from="1733484855075" duration="3926000" />
       <workItem from="1733502629189" duration="112000" />
-      <workItem from="1733508205162" duration="3347000" />
+      <workItem from="1733508205162" duration="6049000" />
     </task>
     <servers />
   </component>
