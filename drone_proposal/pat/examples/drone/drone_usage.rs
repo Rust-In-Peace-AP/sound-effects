@@ -282,12 +282,103 @@ impl MyDrone {
 
     fn handle_command(&mut self, command: DroneCommand) {
         match command {
+
+            DroneCommand::RemoveSender(node_id) => {
+                println!("Removing sender for node: {}", node_id);
+                if let Some(sender) = self.packet_send.remove(&node_id) {
+                    drop(sender); // todo!("Remember to implement the behaviour of the receiver when the sender is dropped in the SC")
+                }
+            }
             DroneCommand::AddSender(node_id, sender) => {
+
+                println!("Adding sender for node: {}", node_id);
                 self.packet_send.insert(node_id, sender);
-            },
-            DroneCommand::SetPacketDropRate(_pdr) => todo!(),
-            DroneCommand::Crash => unreachable!(),
-            DroneCommand::RemoveSender(_node_id) => todo!(),
+            }
+
+            DroneCommand::SetPacketDropRate(pdr) => {
+                println!("Setting packet drop rate to: {}", pdr);
+                self.pdr = pdr;
+            }
+
+            DroneCommand::Crash => {
+                println!("Drone {} received crash command", self.id);
+                self.enter_crashing_behavior();
+            }
+        }
+    }
+
+    /// Puts the drone in a crashing state where it processes remaining messages.
+    fn enter_crashing_behavior(&mut self) {
+        println!("Drone {} entering crashing behavior.", self.id);
+
+        // Continuously process remaining messages until the channel is closed and emptied.
+        loop {
+            match self.packet_recv.recv() {
+                Ok(packet) => {
+                    self.process_crashing_message(packet);
+                }
+                Err(e) => {
+                    println!("Drone {} has processed all remaining messages and is now fully crashed.", self.id);
+                    break;
+                }
+            }
+        }
+    }
+
+    /// Processes a single message while in the crashing state.
+    fn process_crashing_message(&mut self, packet: Packet) {
+        match packet.pack_type {
+            PacketType::FloodRequest(_) => {
+                // todo!("FloodRequests can be lost during the process")
+                println!("Drone {} is crashing: Droppin\
+                g FloodRequest packet.", self.id);
+            }
+            PacketType::Ack(_) | PacketType::Nack(_) | PacketType::FloodResponse(_) => {
+
+                // Forward Ack, Nack, and FloodResponse packets to the next hop
+                let next_hop = self.get_next_hop(&packet);
+                if let Some(next_hop) = next_hop {
+                    self.send_packet(packet, &next_hop);
+                } else {
+                    println!("Drone {} is crashing: Cannot forward packet due to missing next hop.", self.id);
+                }
+            }
+
+            _ => {
+                // Other packet types will send an ErrorInRouting Nack back
+                let nack_packet = self.create_nack_packet(
+                    &packet.routing_header.hops,
+                    packet.routing_header.hop_index + 1,
+                    NackType::ErrorInRouting(self.id),
+                    packet.session_id,
+                );
+
+                let prev_hop = self.get_previous_hop(&packet);
+                if let Some(prev_hop) = prev_hop {
+                    self.send_packet(nack_packet, &prev_hop);
+                } else {
+                    println!("Drone {} is crashing: Cannot send Nack due to missing previous hop.", self.id);
+                }
+            }
+        }
+    }
+
+    /// Helper to get the next hop from the routing header.
+    fn get_next_hop(&self, packet: &Packet) -> Option<NodeId> {
+        let next_hop_idx = packet.routing_header.hop_index + 1;
+        if next_hop_idx < packet.routing_header.hops.len() {
+            Some(packet.routing_header.hops[next_hop_idx])
+        } else {
+            None
+        }
+    }
+
+    /// Helper to get the previous hop from the routing header.
+    fn get_previous_hop(&self, packet: &Packet) -> Option<NodeId> {
+        if packet.routing_header.hop_index > 0 {
+            Some(packet.routing_header.hops[packet.routing_header.hop_index - 1])
+        } else {
+            None
         }
     }
 }
