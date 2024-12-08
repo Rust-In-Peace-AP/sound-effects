@@ -2,17 +2,19 @@
 
 //mod sounds;
 
-mod test;
+mod tests;
 
 use crossbeam_channel::{select_biased, unbounded, Receiver, Sender};
 use std::collections::{HashMap, HashSet};
 use std::{fs, thread};
+use std::time::Duration;
 use wg_2024::config::Config;
 use wg_2024::controller::{DroneCommand, DroneEvent};
 use wg_2024::drone::Drone;
 use wg_2024::network::{NodeId, SourceRoutingHeader};
-use wg_2024::packet::{NackType, Nack, Packet, PacketType, FloodResponse, Ack, FloodRequest};
+use wg_2024::packet::{NackType, Nack, Packet, PacketType, FloodResponse, Ack, FloodRequest, Fragment};
 use wg_2024::packet::NodeType;
+use crate::tests::*;
 //use crate::sounds::QUACK;
 
 //const SOUNDS: [&str; 3] = [QUACK, "sounds/2.mp3", "sounds/3.mp3"];
@@ -64,16 +66,24 @@ impl Drone for MyDrone {
     fn run(&mut self) {
         loop {
             select_biased! {
-                recv(self.controller_recv) -> command => {
-                    if let Ok(command) = command {
-                        self.handle_command(command);
-                    }
-                }
+                // Ricezione di pacchetti e delega alla funzione handle_packet
                 recv(self.packet_recv) -> packet => {
                     if let Ok(packet) = packet {
                         self.handle_packet(packet);
                     }
-                },
+                }
+                // Ricezione di comandi
+                recv(self.controller_recv) -> command => {
+                    if let Ok(command) = command {
+                        match command.clone() {
+                            DroneCommand::Crash => {
+                                self.enter_crashing_behavior();
+                                break;
+                            }
+                            _ => { self.handle_command(command); }
+                        }
+                    }
+                }
             }
         }
     }
@@ -107,7 +117,7 @@ impl MyDrone {
             }
         }
 
-        self.controller_send.send(DroneEvent::PacketSent(packet)).unwrap();
+        self.controller_send.send(DroneEvent::PacketSent(packet.clone())).unwrap();
 
     }
 
@@ -313,10 +323,7 @@ impl MyDrone {
                 self.pdr = pdr;
             }
 
-            DroneCommand::Crash => {
-                println!("Drone {} received crash command", self.id);
-                self.enter_crashing_behavior();
-            }
+            _ => {return;},
         }
     }
 
@@ -336,10 +343,10 @@ impl MyDrone {
         // Continuously process remaining messages until the channel is closed and emptied.
         println!("Drone {} processing remaining messages.", self.id);
         loop {
-            match self.packet_recv.recv() {
+            match self.packet_recv.recv_timeout(Duration::from_secs(5)) {
                 Ok(packet) => {
                     self.process_crashing_message(packet); // Handle messages based on type
-                }
+                },
                 Err(_) => {
                     println!("Drone {} has processed all remaining messages and is now fully crashed.", self.id);
                     break;
@@ -405,63 +412,70 @@ impl SimulationController {
     }
 }
 
-fn parse_config(file: &str) -> Config {
-    let file_str = fs::read_to_string(file).unwrap();
-    toml::from_str(&file_str).unwrap()
-}
+// fn parse_config(file: &str) -> Config {
+//     let file_str = fs::read_to_string(file).unwrap();
+//     toml::from_str(&file_str).unwrap()
+// }
 
 fn main() {
-    let config = parse_config("./config.toml");
+    // let config = parse_config("./config.toml");
+    //
+    // let mut controller_drones = HashMap::new();
+    // let (node_event_send, node_event_recv) = unbounded();
+    //
+    // let mut packet_channels = HashMap::new();
+    // for drone in config.drone.iter() {
+    //     packet_channels.insert(drone.id, unbounded());
+    // }
+    // for client in config.client.iter() {
+    //     packet_channels.insert(client.id, unbounded());
+    // }
+    // for server in config.server.iter() {
+    //     packet_channels.insert(server.id, unbounded());
+    // }
+    //
+    // let mut handles = Vec::new();
+    // for drone in config.drone.into_iter() {
+    //     // controller
+    //     let (controller_drone_send, controller_drone_recv) = unbounded();
+    //     controller_drones.insert(drone.id, controller_drone_send);
+    //     let node_event_send = node_event_send.clone();
+    //     // packet
+    //     let packet_recv = packet_channels[&drone.id].1.clone();
+    //     let packet_send = drone
+    //         .connected_node_ids
+    //         .into_iter()
+    //         .map(|id| (id, packet_channels[&id].0.clone()))
+    //         .collect(); // Hashmap dei vicini con il loro canale di comunicazione
+    //
+    //     handles.push(thread::spawn(move || {
+    //         let mut drone = MyDrone::new(
+    //             drone.id,
+    //             node_event_send, // Canale di invio di eventi al controller
+    //             controller_drone_recv, // Canale di ricezione di comandi dal controller
+    //             packet_recv, // Canale di ricezione di pacchetti
+    //             packet_send, // Canale di invio di pacchetti
+    //             drone.pdr,
+    //         );
+    //
+    //         drone.run();
+    //     }));
+    // }
+    //
+    //
+    // let mut controller = SimulationController {
+    //     drones: controller_drones,// Hashmap di ogni drone con il suo canale di ricezione
+    //     node_event_recv, // Canale di ricezione di eventi dai droni
+    // };
+    // controller.crash_all();
+    //
+    // while let Some(handle) = handles.pop() {
+    //     handle.join().unwrap();
+    // }
 
-    let mut controller_drones = HashMap::new();
-    let (node_event_send, node_event_recv) = unbounded();
+    // Tests
+    test_drone_crash_behavior();
+    test_drone_communication();
 
-    let mut packet_channels = HashMap::new();
-    for drone in config.drone.iter() {
-        packet_channels.insert(drone.id, unbounded());
-    }
-    for client in config.client.iter() {
-        packet_channels.insert(client.id, unbounded());
-    }
-    for server in config.server.iter() {
-        packet_channels.insert(server.id, unbounded());
-    }
-
-    let mut handles = Vec::new();
-    for drone in config.drone.into_iter() {
-        // controller
-        let (controller_drone_send, controller_drone_recv) = unbounded();
-        controller_drones.insert(drone.id, controller_drone_send);
-        let node_event_send = node_event_send.clone();
-        // packet
-        let packet_recv = packet_channels[&drone.id].1.clone();
-        let packet_send = drone
-            .connected_node_ids
-            .into_iter()
-            .map(|id| (id, packet_channels[&id].0.clone()))
-            .collect(); // Hashmap dei vicini con il loro canale di comunicazione
-
-        handles.push(thread::spawn(move || {
-            let mut drone = MyDrone::new(
-                drone.id,
-                node_event_send, // Canale di invio di eventi al controller
-                controller_drone_recv, // Canale di ricezione di comandi dal controller
-                packet_recv, // Canale di ricezione di pacchetti
-                packet_send, // Canale di invio di pacchetti
-                drone.pdr,
-            );
-
-            drone.run();
-        }));
-    }
-
-    let mut controller = SimulationController {
-        drones: controller_drones,// Hashmap di ogni drone con il suo canale di ricezione
-        node_event_recv, // Canale di ricezione di eventi dai droni
-    };
-    controller.crash_all();
-
-    while let Some(handle) = handles.pop() {
-        handle.join().unwrap();
-    }
+    return;
 }

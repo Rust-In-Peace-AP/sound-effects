@@ -1,9 +1,3 @@
-/// this file showcases an example of how you can parse the config found in the Network Initialization File inside some structs, which can then be used to initialize the network
-///
-/// remember to add the Dependencies for toml to Cargo.toml:
-///
-/// [dependencies]
-/// toml = "0.8.19"
 use std::fs;
 use wg_2024::config::Config;
 
