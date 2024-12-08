@@ -1,8 +1,6 @@
 #![allow(unused)]
-
-//mod sounds;
-
 mod tests;
+mod sounds;
 
 use crossbeam_channel::{select_biased, unbounded, Receiver, Sender};
 use std::collections::{HashMap, HashSet};
@@ -15,9 +13,7 @@ use wg_2024::network::{NodeId, SourceRoutingHeader};
 use wg_2024::packet::{NackType, Nack, Packet, PacketType, FloodResponse, Ack, FloodRequest, Fragment};
 use wg_2024::packet::NodeType;
 use crate::tests::*;
-//use crate::sounds::QUACK;
-
-//const SOUNDS: [&str; 3] = [QUACK, "sounds/2.mp3", "sounds/3.mp3"];
+use crate::sounds::*;
 
 fn contains_pair<K, V>(map: &HashMap<K, V>, key: &K, value: &V) -> bool
 where
@@ -76,8 +72,12 @@ impl Drone for MyDrone {
                 recv(self.controller_recv) -> command => {
                     if let Ok(command) = command {
                         match command.clone() {
+
                             DroneCommand::Crash => {
                                 self.enter_crashing_behavior();
+
+                                play_sound_from_url(SOUND_CRASH).unwrap();
+
                                 break;
                             }
                             _ => { self.handle_command(command); }
@@ -108,6 +108,7 @@ impl MyDrone {
             fragment_index: 0,
             nack_type,
         })
+
     }
 
     fn send_packet(&self, packet: Packet, hop: &NodeId) {
@@ -118,10 +119,11 @@ impl MyDrone {
         }
 
         self.controller_send.send(DroneEvent::PacketSent(packet.clone())).unwrap();
-
     }
 
     fn handle_packet(&mut self, packet: Packet) {
+
+        play_sound_from_url(SOUND_RECEIVED).unwrap();
 
         let is_flood_request = match packet.pack_type {
             PacketType::FloodRequest(_) => true,
@@ -208,6 +210,7 @@ impl MyDrone {
 
                 if random > pdr {
 
+                    play_sound_from_url(SOUND_SENT).unwrap();
                     self.send_packet(packet, &next_hop);
 
                 } else {
@@ -494,8 +497,8 @@ fn main() {
     // Tests
     // test_drone_crash_behavior();
     // println!("\nTest passed: test_drone_crash_behavior\n");
-    // test_drone_communication();
-    // println!("\nTest passed: test_drone_communication\n");
+    test_drone_communication();
+    println!("\nTest passed: test_drone_communication\n");
 
     return;
 }

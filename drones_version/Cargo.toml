@@ -8,6 +8,8 @@ wg_2024 = { git = "https://github.com/WGL-2024/WGL_repo_2024.git" , feature = ["
 rand = "0.9.0-beta.1"
 serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0.133"
+rodio = "0.20.1"
+reqwest = { version = "0.12.9", features = ["blocking"] }
 
 [dev-dependencies]
 toml = "0.8.19"
