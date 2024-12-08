@@ -1,5 +1,5 @@
-C:\Users\Admin\Desktop\RustInPeace\sound-effects\drones_version\target\debug\deps\Drone.exe: src/main.rs
+C:\Users\anita\Documents\GitHub\sound-effects\drones_version\windows_drone\target\debug\deps\Drone.exe: src/main.rs
 
-C:\Users\Admin\Desktop\RustInPeace\sound-effects\drones_version\target\debug\deps\Drone.d: src/main.rs
+C:\Users\anita\Documents\GitHub\sound-effects\drones_version\windows_drone\target\debug\deps\Drone.d: src/main.rs
 
 src/main.rs:

@@ -22,7 +22,7 @@ debug = ["wg_2024/debug"]
 
 [[example]]
 name = "drone"
-path = "modules/drone.rs"
+path = "modules/drone_sm.rs"
 feature = ["serialize", "debug", "derive"]
 
 

@@ -48,7 +48,7 @@ pub fn test_drone_communication() {
     packet_map_1[&2].send(packet.clone()).unwrap();
 
     // Verifica che il frammento sia ricevuto dal controller del drone 2
-    let event = controller_recv_2.recv_timeout(Duration::from_secs(4)).unwrap();
+    let event = controller_recv_2.recv_timeout(Duration::from_secs(4));
 
     if let PacketType::MsgFragment(fragment) = packet.pack_type {
         let received_message = String::from_utf8_lossy(&fragment.data[..fragment.length as usize]);
