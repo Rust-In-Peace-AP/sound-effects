@@ -475,6 +475,7 @@ fn main() {
 
     // Tests
     test_drone_crash_behavior();
+    println!("Test passed: test_drone_crash_behavior");
     test_drone_communication();
 
     return;
