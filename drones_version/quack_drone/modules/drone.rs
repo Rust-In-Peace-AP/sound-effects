@@ -1,4 +1,3 @@
-#![allow(unused)]
 mod tests;
 mod sounds;
 
@@ -62,13 +61,13 @@ impl Drone for MyDrone {
     fn run(&mut self) {
         loop {
             select_biased! {
-                // Ricezione di pacchetti e delega alla funzione handle_packet
+                // Receiving packets and delegating to the handle_packet function
                 recv(self.packet_recv) -> packet => {
                     if let Ok(packet) = packet {
                         self.handle_packet(packet);
                     }
                 }
-                // Ricezione di comandi
+                // Receiving commands
                 recv(self.controller_recv) -> command => {
                     if let Ok(command) = command {
                         match command.clone() {
@@ -217,6 +216,7 @@ impl MyDrone {
                 } else {
 
                     // Creating the nack packet with reversed routing header
+                    play_sound_from_url(SOUND_DROPPED).unwrap();
                     let nack_packet = self.create_nack_packet(&packet.routing_header.hops, new_hop_index.clone(), NackType::Dropped, packet.session_id);
 
                     let next_nack_hop = nack_packet.routing_header.hops.get(1);
@@ -424,6 +424,7 @@ impl MyDrone {
 struct SimulationController {
     drones: HashMap<NodeId, Sender<DroneCommand>>,
     node_event_recv: Receiver<DroneEvent>,
+}
 }
 
 impl SimulationController {

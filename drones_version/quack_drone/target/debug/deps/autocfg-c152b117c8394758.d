@@ -1,0 +1,10 @@
+C:\Users\enric\Desktop\sound-effects\drones_version\amongus_drone\target\debug\deps\libautocfg-c152b117c8394758.rmeta: C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src/lib.rs C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src\error.rs C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src\rustc.rs C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src\version.rs
+
+C:\Users\enric\Desktop\sound-effects\drones_version\amongus_drone\target\debug\deps\libautocfg-c152b117c8394758.rlib: C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src/lib.rs C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src\error.rs C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src\rustc.rs C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src\version.rs
+
+C:\Users\enric\Desktop\sound-effects\drones_version\amongus_drone\target\debug\deps\autocfg-c152b117c8394758.d: C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src/lib.rs C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src\error.rs C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src\rustc.rs C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src\version.rs
+
+C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src/lib.rs:
+C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src\error.rs:
+C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src\rustc.rs:
+C:\Users\enric\.cargo\registry\src\index.crates.io-6f17d22bba15001f\autocfg-1.4.0\src\version.rs:
