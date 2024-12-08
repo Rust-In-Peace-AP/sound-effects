@@ -5,7 +5,7 @@ use reqwest::blocking::get; // Importing the blocking version of the `get` funct
 // URLs for the various Windows sound effects stored in the GitHub repository
 pub const SOUND_SENT: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/sounds/amongus_sounds/amongus_sent.mp3";
 pub const SOUND_RECEIVED: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/sounds/amongus_sounds/amongus_received.mp3";
-pub const SOUND_CRASH: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/sounds/amongus_sounds/amongus_crashed.mp3";
+pub const SOUND_CRASH: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/sounds/amongus_sounds/amongus_crash.mp3";
 pub const SOUND_DROPPED: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/sounds/amongus_sounds/amongus_dropped.mp3";
 
 // Function to play a sound from a URL
