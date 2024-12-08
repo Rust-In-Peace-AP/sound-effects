@@ -158,9 +158,10 @@ impl MyDrone {
         true
     }
 
-    fn play_sound(&self) {
+    fn play_sound(&self, name_sound: &str) {
+
         // Download the sound file from GitHub repository
-        let sound_url = "https://example.com/soundfile.wav";  // !NB! Replace with the actual URL of the sound file that we don't have for now
+        let sound_url = name_sound;  // !NB! Replace with the actual URL of the sound file that we don't have for now
         let response = get(sound_url).unwrap();
         let cursor = Cursor::new(response.bytes().unwrap());
 

@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+mod sounds;
 
 use crossbeam_channel::{select_biased, unbounded, Receiver, Sender};
 use std::collections::HashMap;
@@ -11,6 +12,9 @@ use wg_2024::network::{NodeId, SourceRoutingHeader};
 use wg_2024::packet::{NackType, Nack, Packet, PacketType, FloodResponse, Ack};
 use wg_2024::packet::NackType::UnexpectedRecipient;
 use wg_internal::packet::NodeType;
+use crate::sounds::QUACK;
+
+const SOUNDS: [&str; 3] = [QUACK, "sounds/2.mp3", "sounds/3.mp3"];
 
 /// Example of drone implementation
 struct MyDrone {
@@ -22,6 +26,7 @@ struct MyDrone {
     packet_send: HashMap<NodeId, Sender<Packet>>,
     flood_ids: Vec<u64>,
 }
+
 
 impl Drone for MyDrone {
     fn new(
@@ -66,7 +71,6 @@ impl Drone for MyDrone {
     }
 }
 
-
 // Reversing the routing header
 fn reverse_routing_header(hops: &Vec<NodeId>, new_hop_index: usize) -> SourceRoutingHeader {
     let (reverse_hops, _) = hops.split_at(new_hop_index);
@@ -78,18 +82,15 @@ fn reverse_routing_header(hops: &Vec<NodeId>, new_hop_index: usize) -> SourceRou
 
 impl MyDrone {
 
+//todo!("Change the code with the new functions")
     fn create_nack_packet(&self, hops: &Vec<NodeId>, hop_idx: usize, nack_type: NackType, session_id: u64) -> Packet {
 
         let rev_routing_header = reverse_routing_header(hops, hop_idx);
 
-        Packet {
-            pack_type: PacketType::Nack(Nack {
-                fragment_index: 0,
-                nack_type,
-            }),
-            routing_header: rev_routing_header,
-            session_id,
-        }
+        Packet::new_nack(rev_routing_header, session_id, Nack {
+            fragment_index: 0,
+            nack_type,
+        })
     }
 
     fn send_packet(&self, packet: Packet, hop: &NodeId) {
@@ -141,6 +142,7 @@ impl MyDrone {
             self.send_packet(nack_packet,&packet.routing_header.hops[new_hop_index-2]);
 
             // Sending the packet to the controller if it's an Ack or Nack or FloodResponse
+            // todo!("Think about sending to the SC")
             if(send_sc) {
                 self.controller_send.send(DroneEvent::ControllerShortcut(packet)).unwrap();
             }
@@ -289,6 +291,7 @@ impl MyDrone {
                     drop(sender); // todo!("Remember to implement the behaviour of the receiver when the sender is dropped in the SC")
                 }
             }
+
             DroneCommand::AddSender(node_id, sender) => {
 
                 println!("Adding sender for node: {}", node_id);
@@ -318,6 +321,7 @@ impl MyDrone {
                     self.process_crashing_message(packet);
                 }
                 Err(e) => {
+                    // todo!("Send nack and then send the packet to the SC to send the packet to the next node")
                     println!("Drone {} has processed all remaining messages and is now fully crashed.", self.id);
                     break;
                 }
@@ -329,7 +333,7 @@ impl MyDrone {
     fn process_crashing_message(&mut self, packet: Packet) {
         match packet.pack_type {
             PacketType::FloodRequest(_) => {
-                // todo!("FloodRequests can be lost during the process")
+                // todo!("FloodRequests have to be lost during the process")
                 println!("Drone {} is crashing: Droppin\
                 g FloodRequest packet.", self.id);
             }
@@ -344,7 +348,8 @@ impl MyDrone {
                 }
             }
 
-            _ => {
+            PacketType::MsgFragment(_fragment) => {
+                // todo!("MsgFragments maybe have to be sent to SC to get to destination")
                 // Other packet types will send an ErrorInRouting Nack back
                 let nack_packet = self.create_nack_packet(
                     &packet.routing_header.hops,
