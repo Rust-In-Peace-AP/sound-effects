@@ -425,7 +425,7 @@ struct SimulationController {
     drones: HashMap<NodeId, Sender<DroneCommand>>,
     node_event_recv: Receiver<DroneEvent>,
 }
-}
+
 
 impl SimulationController {
     fn crash_all(&mut self) {

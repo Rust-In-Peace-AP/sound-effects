@@ -3,10 +3,10 @@ use std::io::{Cursor, Read}; // Importing Cursor for wrapping in-memory data and
 use reqwest::blocking::get; // Importing the blocking version of the `get` function from the reqwest library for HTTP requests
 
 // URLs for the various Windows sound effects stored in the GitHub repository
-pub const SOUND_SENT: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/sounds/amongus_sounds/amongus_sent.mp3";
-pub const SOUND_RECEIVED: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/sounds/amongus_sounds/amongus_received.mp3";
-pub const SOUND_CRASH: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/sounds/amongus_sounds/amongus_crashed.mp3";
-pub const SOUND_DROPPED: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/sounds/amongus_sounds/amongus_dropped.mp3";
+pub const SOUND_SENT: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/sounds/quack_sounds/quack_sent.mp3";
+pub const SOUND_RECEIVED: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/sounds/quack_sounds/quack_received.mp3";
+pub const SOUND_CRASH: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/sounds/quack_sounds/quack_crashed.mp3";
+pub const SOUND_DROPPED: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/sounds/quack_sounds/quack_dropped.mp3";
 
 // Function to play a sound from a URL
 pub fn play_sound_from_url(url: &str) -> Result<(), Box<dyn std::error::Error>> {

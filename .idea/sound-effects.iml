@@ -5,6 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/drones_version/windows_drone/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/drones_version/amongus_drone/target" />
       <excludeFolder url="file://$MODULE_DIR$/drones_version/windows_drone/target" />
+      <excludeFolder url="file://$MODULE_DIR$/drones_version/quack_drone/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
