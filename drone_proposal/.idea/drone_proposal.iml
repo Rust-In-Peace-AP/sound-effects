@@ -12,8 +12,10 @@
       <sourceFolder url="file://$MODULE_DIR$/pat/examples" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/pat/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/pie/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/pat/Drone/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/pat/target" />
       <excludeFolder url="file://$MODULE_DIR$/pie/target" />
+      <excludeFolder url="file://$MODULE_DIR$/pat/Drone/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

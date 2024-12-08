@@ -1,35 +1,27 @@
 [package]
-name = "wg_2024"
+name = "Drone"
 version = "0.1.0"
 edition = "2021"
 
-[workspace]
-members = ["crates/*"]
-
 [dependencies]
-wg_internal = { path = "crates/wg_internal" }
+wg_2024 = { git = "https://github.com/WGL-2024/WGL_repo_2024.git" , feature = ["debug"]}
 rand = "0.9.0-beta.1"
+serde = { version = "1.0.215", features = ["derive"] }
+serde_json = "1.0.133"
 
 [dev-dependencies]
 toml = "0.8.19"
 crossbeam-channel = "0.5.13"
-serde = { version = "1.0.215", features = ["derive"] }
-serde_json = "1.0.133"
 
 [features]
-serialize = ["wg_internal/serialize"]
-debug = ["wg_internal/debug"]
+serialize = ["wg_2024/serialize"]
+debug = ["wg_2024/debug"]
 
 [[example]]
-name = "parser"
-path = "examples/config/parser.rs"
-required-features = ["serialize"]
+name = "drone"
+path = "Drone/modules/drone.rs"
+feature = ["serialize", "debug"]
 
-[[example]]
-name = "drone_usage"
-path = "examples/drone/drone_usage.rs"
-required-features = ["serialize"]
 
-[[example]]
-name = "messages"
-path = "examples/message/server.rs"
+
+
