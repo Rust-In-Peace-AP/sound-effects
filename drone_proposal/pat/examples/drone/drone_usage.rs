@@ -113,6 +113,12 @@ impl MyDrone {
 
     fn handle_packet(&mut self, packet: Packet) {
 
+
+        let is_flood_request = match packet.pack_type {
+            PacketType::FloodRequest(_) => true,
+            _ => false,
+        };
+
         let send_sc = match packet.pack_type {
             PacketType::Ack(_) | PacketType::Nack(_) | PacketType::FloodResponse(_) => true,
             _ => false,
@@ -121,7 +127,7 @@ impl MyDrone {
         let start_hop_index = packet.routing_header.hop_index;
 
         // Checking if the packet is for this drone
-        if packet.routing_header.hops[start_hop_index] != self.id /*&& packet.pack_type != PacketType::FloodRequest*/{ // !todo!("Trova un modo per fare il comparison")
+        if packet.routing_header.hops[start_hop_index] != self.id && !is_flood_request{
 
             // Creating the nack packet with reversed routing header, hop index incremented because it hasn't been incremented yet and wouldn't split the actual node
             let nack_packet = self.create_nack_packet(&packet.routing_header.hops, start_hop_index+1, NackType::UnexpectedRecipient(self.id), packet.session_id);
@@ -140,7 +146,7 @@ impl MyDrone {
         let new_hop_index = packet.routing_header.hop_index + 1;
 
         // Checking if the packet has reached the destination
-        if new_hop_index == packet.routing_header.hops.len() /*&& packet.pack_type != PacketType::FloodRequest*/ {
+        if new_hop_index == packet.routing_header.hops.len() && !is_flood_request {
 
             // Creating the nack packet with reversed routing header
             let nack_packet = self.create_nack_packet(&packet.routing_header.hops, new_hop_index.clone(), NackType::DestinationIsDrone, packet.session_id);
@@ -156,7 +162,7 @@ impl MyDrone {
         let next_hop = packet.routing_header.hops[new_hop_index];
 
         // Checking if there is a channel to the next hop. So checking if it's a neighbor
-        if self.packet_send.get(&next_hop).is_none() /*&& packet.pack_type != PacketType::FloodRequest*/ {
+        if self.packet_send.get(&next_hop).is_none() && !is_flood_request {
 
             // Creating the nack packet with reversed routing header
             let nack_packet = self.create_nack_packet(&packet.routing_header.hops, new_hop_index.clone(), NackType::ErrorInRouting(next_hop), packet.session_id);
@@ -448,7 +454,7 @@ fn main() {
             drone.run();
         }));
     }
-    
+
     let mut controller = SimulationController {
         drones: controller_drones,// Hashmap di ogni drone con il suo canale di ricezione
         node_event_recv, // Canale di ricezione di eventi dai droni
