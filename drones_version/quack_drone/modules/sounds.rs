@@ -3,8 +3,8 @@ use std::io::{Cursor, Read};
 use reqwest::blocking::get;
 
 pub const SOUND_SENT: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/categories/success/quackable/quack1.mp3";
-pub const SOUND_RECEIVED: &str = "";
-pub const SOUND_CRASH: &str = "";
+pub const SOUND_RECEIVED: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/categories/success/quackable/quack1.mp3";
+pub const SOUND_CRASH: &str = "https://raw.githubusercontent.com/Rust-In-Peace-AP/sound-effects/main/categories/success/quackable/quack1.mp3";
 
 pub fn play_sound_from_url(url: &str) -> Result<(), Box<dyn std::error::Error>> {
     // Scarica il file audio
