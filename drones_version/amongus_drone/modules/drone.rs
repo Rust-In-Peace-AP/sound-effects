@@ -500,8 +500,8 @@ fn main() {
     // Tests
     // test_drone_crash_behavior();
     // println!("\nTest passed: test_drone_crash_behavior\n");
-    // test_drone_communication();
-    // println!("\nTest passed: test_drone_communication\n");
+    test_drone_communication();
+    println!("\nTest passed: test_drone_communication\n");
     // test_drone_drop();
     // println!("\nTest passed: test_drone_drop\n");
 

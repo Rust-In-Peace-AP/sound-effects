@@ -125,6 +125,8 @@ impl MyDrone {
 
         play_sound_from_url(SOUND_RECEIVED).unwrap();
 
+        println!("Drone {} received packet with session id: {}", self.id, packet.session_id);
+
         let is_flood_request = match packet.pack_type {
             PacketType::FloodRequest(_) => true,
             _ => false,
@@ -198,6 +200,8 @@ impl MyDrone {
             return;
 
         }
+
+        println!("Drone {} entering pattern matching with packer with session id: {}", self.id, packet.session_id);
 
         // Handling the packet based on its type
         match &packet.pack_type {
@@ -444,68 +448,69 @@ impl SimulationController {
 // }
 
 fn main() {
-    // let config = parse_config("./config.toml");
-    //
-    // let mut controller_drones = HashMap::new();
-    // let (node_event_send, node_event_recv) = unbounded();
-    //
-    // let mut packet_channels = HashMap::new();
-    // for drone in config.drone.iter() {
-    //     packet_channels.insert(drone.id, unbounded());
-    // }
-    // for client in config.client.iter() {
-    //     packet_channels.insert(client.id, unbounded());
-    // }
-    // for server in config.server.iter() {
-    //     packet_channels.insert(server.id, unbounded());
-    // }
-    //
-    // let mut handles = Vec::new();
-    // for drone in config.drone.into_iter() {
-    //     // controller
-    //     let (controller_drone_send, controller_drone_recv) = unbounded();
-    //     controller_drones.insert(drone.id, controller_drone_send);
-    //     let node_event_send = node_event_send.clone();
-    //     // packet
-    //     let packet_recv = packet_channels[&drone.id].1.clone();
-    //     let packet_send = drone
-    //         .connected_node_ids
-    //         .into_iter()
-    //         .map(|id| (id, packet_channels[&id].0.clone()))
-    //         .collect(); // Hashmap dei vicini con il loro canale di comunicazione
-    //
-    //     handles.push(thread::spawn(move || {
-    //         let mut drone = MyDrone::new(
-    //             drone.id,
-    //             node_event_send, // Canale di invio di eventi al controller
-    //             controller_drone_recv, // Canale di ricezione di comandi dal controller
-    //             packet_recv, // Canale di ricezione di pacchetti
-    //             packet_send, // Canale di invio di pacchetti
-    //             drone.pdr,
-    //         );
-    //
-    //         drone.run();
-    //     }));
-    // }
-    //
-    //
-    // let mut controller = SimulationController {
-    //     drones: controller_drones,// Hashmap di ogni drone con il suo canale di ricezione
-    //     node_event_recv, // Canale di ricezione di eventi dai droni
-    // };
-    // controller.crash_all();
-    //
-    // while let Some(handle) = handles.pop() {
-    //     handle.join().unwrap();
-    // }
-
+    {
+        // let config = parse_config("./config.toml");
+        //
+        // let mut controller_drones = HashMap::new();
+        // let (node_event_send, node_event_recv) = unbounded();
+        //
+        // let mut packet_channels = HashMap::new();
+        // for drone in config.drone.iter() {
+        //     packet_channels.insert(drone.id, unbounded());
+        // }
+        // for client in config.client.iter() {
+        //     packet_channels.insert(client.id, unbounded());
+        // }
+        // for server in config.server.iter() {
+        //     packet_channels.insert(server.id, unbounded());
+        // }
+        //
+        // let mut handles = Vec::new();
+        // for drone in config.drone.into_iter() {
+        //     // controller
+        //     let (controller_drone_send, controller_drone_recv) = unbounded();
+        //     controller_drones.insert(drone.id, controller_drone_send);
+        //     let node_event_send = node_event_send.clone();
+        //     // packet
+        //     let packet_recv = packet_channels[&drone.id].1.clone();
+        //     let packet_send = drone
+        //         .connected_node_ids
+        //         .into_iter()
+        //         .map(|id| (id, packet_channels[&id].0.clone()))
+        //         .collect(); // Hashmap dei vicini con il loro canale di comunicazione
+        //
+        //     handles.push(thread::spawn(move || {
+        //         let mut drone = MyDrone::new(
+        //             drone.id,
+        //             node_event_send, // Canale di invio di eventi al controller
+        //             controller_drone_recv, // Canale di ricezione di comandi dal controller
+        //             packet_recv, // Canale di ricezione di pacchetti
+        //             packet_send, // Canale di invio di pacchetti
+        //             drone.pdr,
+        //         );
+        //
+        //         drone.run();
+        //     }));
+        // }
+        //
+        //
+        // let mut controller = SimulationController {
+        //     drones: controller_drones,// Hashmap di ogni drone con il suo canale di ricezione
+        //     node_event_recv, // Canale di ricezione di eventi dai droni
+        // };
+        // controller.crash_all();
+        //
+        // while let Some(handle) = handles.pop() {
+        //     handle.join().unwrap();
+        // }
+    }
     // Tests
     // test_drone_crash_behavior();
     // println!("\nTest passed: test_drone_crash_behavior\n");
-    // test_drone_communication();
-    // println!("\nTest passed: test_drone_communication\n");
-    test_drone_drop();
-    println!("\nTest passed: test_drone_drop\n");
+    test_drone_communication();
+    println!("\nTest passed: test_drone_communication\n");
+    // test_drone_drop();
+    // println!("\nTest passed: test_drone_drop\n");
 
     return;
 }

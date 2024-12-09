@@ -441,7 +441,9 @@ impl SimulationController {
 // }
 
 fn main() {
-    // let config = parse_config("./config.toml");
+
+    {
+// let config = parse_config("./config.toml");
     //
     // let mut controller_drones = HashMap::new();
     // let (node_event_send, node_event_recv) = unbounded();
@@ -495,14 +497,14 @@ fn main() {
     // while let Some(handle) = handles.pop() {
     //     handle.join().unwrap();
     // }
-
+}
     // Tests
-    test_drone_crash_behavior();
-    println!("\nTest passed: test_drone_crash_behavior\n");
-    test_drone_communication();
-    println!("\nTest passed: test_drone_communication\n");
-    test_drone_drop();
-    println!("\nTest passed: test_drone_drop\n");
+    // test_drone_crash_behavior();
+    // println!("\nTest passed: test_drone_crash_behavior\n");
+    // test_drone_communication();
+    // println!("\nTest passed: test_drone_communication\n");
+    // test_drone_drop();
+    // println!("\nTest passed: test_drone_drop\n");
 
     return;
 }
