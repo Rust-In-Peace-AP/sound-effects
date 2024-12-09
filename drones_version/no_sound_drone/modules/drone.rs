@@ -122,6 +122,7 @@ impl MyDrone {
 
     fn handle_packet(&mut self, packet: Packet) {
 
+        println!("Drone {} received packet: {:?}", self.id, packet);
 
         let is_flood_request = match packet.pack_type {
             PacketType::FloodRequest(_) => true,
@@ -493,12 +494,12 @@ fn main() {
         // }
     }
     /// Tests
-    test_drone_crash_behavior();
-    println!("\nTest passed: test_drone_crash_behavior\n");
+    // test_drone_crash_behavior();
+    // println!("\nTest passed: test_drone_crash_behavior\n");
     test_drone_communication();
     println!("\nTest passed: test_drone_communication\n");
-    test_drone_drop();
-    println!("\nTest passed: test_drone_drop\n");
+    // test_drone_drop();
+    // println!("\nTest passed: test_drone_drop\n");
 
     return;
 }

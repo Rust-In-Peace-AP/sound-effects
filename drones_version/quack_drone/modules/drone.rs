@@ -123,6 +123,8 @@ impl MyDrone {
 
     fn handle_packet(&mut self, packet: Packet) {
 
+        println!("Drone {} received packet: {:?}", self.id, packet);
+
         play_sound_from_url(SOUND_RECEIVED).unwrap();
 
         println!("Drone {} received packet with session id: {}", self.id, packet.session_id);

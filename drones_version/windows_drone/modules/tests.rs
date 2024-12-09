@@ -99,7 +99,6 @@ pub fn test_drone_communication() {
 
     let mut drone1 = MyDrone::new(1, controller_send_1, command_recv_1, packet_recv_1, packet_send_1.clone(), 0.0);
 
-
     let mut drone2 = MyDrone::new(2, controller_send_2, command_recv_2, packet_recv_2, packet_send_2.clone(), 0.0);
 
     let mut drone3 = MyDrone::new(3, controller_send_3, command_recv_3, packet_recv_3, packet_send_3.clone(), 0.0);

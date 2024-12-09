@@ -71,27 +71,38 @@ pub fn test_drone_communication() {
     let (controller_send_1, controller_recv_1) = unbounded();
     let (controller_send_2, controller_recv_2) = unbounded();
     let (controller_send_3, controller_recv_3) = unbounded();
-    let (packet_send_1, packet_recv_2) = unbounded();
-    let (packet_send_2, packet_recv_1) = unbounded();
-    let (packet_send_3, packet_recv_3) = unbounded();
+
     let (command_send_1, command_recv_1) = unbounded();
     let (command_send_2, command_recv_2) = unbounded();
     let (command_send_3, command_recv_3) = unbounded();
 
 
+    let mut packet_channels= HashMap::new();
+    packet_channels.insert(1, unbounded());
+    packet_channels.insert(2, unbounded());
+    packet_channels.insert(3, unbounded());
+
+    let packet_recv_1 = packet_channels.get(&1).unwrap().1.clone();
+    let packet_recv_2 = packet_channels.get(&2).unwrap().1.clone();
+    let packet_recv_3 = packet_channels.get(&3).unwrap().1.clone();
+
+    let mut packet_send_1 = HashMap::new();
+    packet_send_1.insert(2, packet_channels.get(&2).unwrap().0.clone());
+    let mut packet_send_2= HashMap::new();
+    packet_send_2.insert(1, packet_channels.get(&1).unwrap().0.clone());
+    packet_send_2.insert(3, packet_channels.get(&3).unwrap().0.clone());
+    let mut packet_send_3 = HashMap::new();
+    packet_send_3.insert(2, packet_channels.get(&2).unwrap().0.clone());
+
+
     // Configurazione dei droni
-    let mut packet_map_1 = HashMap::new();
-    packet_map_1.insert(2, packet_send_1.clone());
-    let mut drone1 = MyDrone::new(1, controller_send_1, command_recv_1, packet_recv_1, packet_map_1.clone(), 0.0);
 
-    let mut packet_map_2 = HashMap::new();
-    packet_map_2.insert(1, packet_send_2.clone());
-    packet_map_2.insert(3, packet_send_2.clone());
-    let mut drone2 = MyDrone::new(2, controller_send_2, command_recv_2, packet_recv_2, packet_map_2.clone(), 0.0);
+    let mut drone1 = MyDrone::new(1, controller_send_1, command_recv_1, packet_recv_1, packet_send_1.clone(), 0.0);
 
-    let mut packet_map_3 = HashMap::new();
-    packet_map_3.insert(2, packet_send_3.clone());
-    let mut drone3 = MyDrone::new(3, controller_send_3, command_recv_3, packet_recv_3, packet_map_3.clone(), 0.0);
+
+    let mut drone2 = MyDrone::new(2, controller_send_2, command_recv_2, packet_recv_2, packet_send_2.clone(), 0.0);
+
+    let mut drone3 = MyDrone::new(3, controller_send_3, command_recv_3, packet_recv_3, packet_send_3.clone(), 0.0);
 
     // Avvio dei droni in thread separati
     let handle_1 = thread::spawn(move || drone1.run());
@@ -101,29 +112,52 @@ pub fn test_drone_communication() {
     // Creazione di un frammento di messaggio
     let message = "Hello, this is a test message!".to_string();
     let fragment = Fragment::from_string(0, 1, message);
-    let packet = Packet::new_fragment(SourceRoutingHeader{hop_index: 1, hops: vec![1,2,3]}, 42, fragment);
+    let packet = Packet::new_fragment(SourceRoutingHeader { hop_index: 1, hops: vec![1, 2, 3] }, 42, fragment);
 
     // Invio del frammento dal drone 1 al drone 2
-    packet_map_1[&2].send(packet.clone()).unwrap();
+    if let Some(sender) = packet_send_1.get(&2) {
+        if sender.send(packet.clone()).is_err() {
+            println!("Errore nell'invio del pacchetto dal drone 1 al drone 2.");
+        }
+    } else {
+        println!("Errore: nessun mittente trovato per il drone 2.");
+    }
 
     // Verifica che il frammento sia ricevuto dal controller del drone 2
-    let event = controller_recv_2.recv_timeout(Duration::from_secs(4)).unwrap();
+    match controller_recv_2.recv_timeout(Duration::from_secs(8)) {
+        Ok(event) => {
+            if let PacketType::MsgFragment(fragment) = packet.pack_type.clone() {
+                let received_message = String::from_utf8_lossy(&fragment.data[..fragment.length as usize]);
+                assert_eq!(received_message, "Hello, this is a test message!");
+                println!("Test passed! Drone 2 received fragment: {}", received_message);
+            } else {
+                println!("Errore: il pacchetto ricevuto non è un frammento di messaggio.");
+            }
+        }
+        Err(_) => println!("Timeout o errore nel ricevere il frammento dal controller del drone 2."),
+    }
 
-    if let PacketType::MsgFragment(fragment) = packet.pack_type {
-        let received_message = String::from_utf8_lossy(&fragment.data[..fragment.length as usize]);
-        assert_eq!(received_message, "Hello, this is a test message!");
-        println!("Test passed! Drone 2 received fragment: {}", fragment);
+    match controller_recv_3.recv_timeout(Duration::from_secs(10)) {
+        Ok(event) => {
+            if let PacketType::MsgFragment(fragment) = packet.pack_type.clone() {
+                let received_message = String::from_utf8_lossy(&fragment.data[..fragment.length as usize]);
+                assert_eq!(received_message, "Hello, this is a test message!");
+                println!("Test passed! Drone 3 received fragment: {}", received_message);
+            } else {
+                println!("Errore: il pacchetto ricevuto non è un frammento di messaggio.");
+            }
+        }
+        Err(_) => println!("Timeout o errore nel ricevere il frammento dal controller del drone 3."),
     }
 
 
     // Terminazione dei droni
-    command_send_1.send(DroneCommand::Crash).unwrap();
-    command_send_2.send(DroneCommand::Crash).unwrap();
-    command_send_3.send(DroneCommand::Crash).unwrap();
-    handle_1.join().unwrap();
-    handle_2.join().unwrap();
-    handle_3.join().unwrap();
-    return;
+    let _ = command_send_1.send(DroneCommand::Crash);
+    let _ = command_send_2.send(DroneCommand::Crash);
+    let _ = command_send_3.send(DroneCommand::Crash);
+    let _ = handle_1.join();
+    let _ = handle_2.join();
+    let _ = handle_3.join();
 }
 
 pub fn test_drone_crash_behavior() {

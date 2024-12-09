@@ -124,6 +124,8 @@ impl MyDrone {
 
     fn handle_packet(&mut self, packet: Packet) {
 
+        println!("Drone {} received packet: {:?}", self.id, packet);
+
         play_sound_from_url(SOUND_RECEIVED).unwrap();
 
         let is_flood_request = match packet.pack_type {
@@ -442,6 +444,7 @@ impl SimulationController {
 // }
 
 fn main() {
+    {
     // let config = parse_config("./config.toml");
     //
     // let mut controller_drones = HashMap::new();
@@ -496,7 +499,7 @@ fn main() {
     // while let Some(handle) = handles.pop() {
     //     handle.join().unwrap();
     // }
-
+}
     // Tests
     // test_drone_crash_behavior();
     // println!("\nTest passed: test_drone_crash_behavior\n");
