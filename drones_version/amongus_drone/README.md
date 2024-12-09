@@ -1,17 +1,7 @@
-# Sound-effects
-
-In this repository you will find all the sound-effects, divided in categories, for your drones :flying_saucer:
+# Among Us Sound Effects
 
 ---
 
-In the [categories](https://github.com/Rust-In-Peace-AP/sound-effects/tree/main/categories) section, you'll find two directories:
-
-- Success
-  - That you can use for the successful operations.
-- Fail
-  - For the failed operations.
-
-In each directory you will also find many sub-categories where the sound effects have
-been classified, so that you can choose your favorites sound to make you sending operation a funny experience :sparkles:
-
-//Spiegare come importare i suoni
+This is a collection of sound effects from the game Among Us.
+Do you want to have a drone that maybe be a little sus?
+Then this is the right place for you! Have fun with our SusDrones!

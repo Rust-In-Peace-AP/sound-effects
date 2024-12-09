@@ -217,6 +217,9 @@ impl MyDrone {
 
                     // Creating the nack packet with reversed routing header
                     play_sound_from_url(SOUND_DROPPED).unwrap();
+
+                    println!("Drone {} dropped packet with session id: {}", self.id, packet.session_id);
+
                     let nack_packet = self.create_nack_packet(&packet.routing_header.hops, new_hop_index.clone(), NackType::Dropped, packet.session_id);
 
                     let next_nack_hop = nack_packet.routing_header.hops.get(1);
@@ -499,8 +502,10 @@ fn main() {
     // Tests
     // test_drone_crash_behavior();
     // println!("\nTest passed: test_drone_crash_behavior\n");
-    test_drone_communication();
-    println!("\nTest passed: test_drone_communication\n");
+    // test_drone_communication();
+    // println!("\nTest passed: test_drone_communication\n");
+    test_drone_drop();
+    println!("\nTest passed: test_drone_drop\n");
 
     return;
 }

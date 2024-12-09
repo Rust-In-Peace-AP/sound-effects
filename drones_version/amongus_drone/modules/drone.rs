@@ -1,3 +1,4 @@
+#![allow(unused)]
 mod tests;
 mod sounds;
 
@@ -11,8 +12,8 @@ use wg_2024::drone::Drone;
 use wg_2024::network::{NodeId, SourceRoutingHeader};
 use wg_2024::packet::{NackType, Nack, Packet, PacketType, FloodResponse, Ack, FloodRequest, Fragment};
 use wg_2024::packet::NodeType;
-use crate::tests::*;
 use crate::sounds::*;
+use crate::tests::*;
 
 fn contains_pair<K, V>(map: &HashMap<K, V>, key: &K, value: &V) -> bool
 where
@@ -61,13 +62,13 @@ impl Drone for MyDrone {
     fn run(&mut self) {
         loop {
             select_biased! {
-                // Receiving packets and delegating to the handle_packet function
+                // Ricezione di pacchetti e delega alla funzione handle_packet
                 recv(self.packet_recv) -> packet => {
                     if let Ok(packet) = packet {
                         self.handle_packet(packet);
                     }
                 }
-                // Receiving commands
+                // Ricezione di comandi
                 recv(self.controller_recv) -> command => {
                     if let Ok(command) = command {
                         match command.clone() {
@@ -211,12 +212,13 @@ impl MyDrone {
                 if random > pdr {
 
                     play_sound_from_url(SOUND_SENT).unwrap();
+
                     self.send_packet(packet, &next_hop);
 
                 } else {
 
-                    // Creating the nack packet with reversed routing header
                     play_sound_from_url(SOUND_DROPPED).unwrap();
+                    // Creating the nack packet with reversed routing header
                     let nack_packet = self.create_nack_packet(&packet.routing_header.hops, new_hop_index.clone(), NackType::Dropped, packet.session_id);
 
                     let next_nack_hop = nack_packet.routing_header.hops.get(1);
@@ -498,8 +500,10 @@ fn main() {
     // Tests
     // test_drone_crash_behavior();
     // println!("\nTest passed: test_drone_crash_behavior\n");
-    test_drone_communication();
-    println!("\nTest passed: test_drone_communication\n");
+    // test_drone_communication();
+    // println!("\nTest passed: test_drone_communication\n");
+    // test_drone_drop();
+    // println!("\nTest passed: test_drone_drop\n");
 
     return;
 }

@@ -1,17 +1,16 @@
 # Sound-effects
 
-In this repository you will find all the sound-effects, divided in categories, for your drones :flying_saucer:
+In this repository you'll find some versions of our drone. :flying_saucer:
 
----
+You'll probably are thinking what are we meaning with "some versions".  
+Like, "Duh, we were meant to have just 1 impl. We liked to think a little outside the box.  
+We have **different**, but *equal* version of our drone. What makes them different are the, :drum: :drum: :drum:,  
+**SOUND EFFECTS**.
 
-In the [categories](https://github.com/Rust-In-Peace-AP/sound-effects/tree/main/categories) section, you'll find two directories:
+We just wanted to make the things a little funnier adding some drone's version as:
+ - Super Mario drone;
+ - Among Us drone;
+ - Windows XP drone;
+ - **QUACK** drone;
 
-- Success
-  - That you can use for the successful operations.
-- Fail
-  - For the failed operations.
-
-In each directory you will also find many sub-categories where the sound effects have
-been classified, so that you can choose your favorites sound to make you sending operation a funny experience :sparkles:
-
-//Spiegare come importare i suoni
+So, if you wanna have a basic drone but with some funny feature, this is the one for you! :smirk:

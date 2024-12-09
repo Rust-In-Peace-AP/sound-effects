@@ -1,17 +1,8 @@
-# Sound-effects
-
-In this repository you will find all the sound-effects, divided in categories, for your drones :flying_saucer:
+# Super Mario Sound Effects
 
 ---
 
-In the [categories](https://github.com/Rust-In-Peace-AP/sound-effects/tree/main/categories) section, you'll find two directories:
-
-- Success
-  - That you can use for the successful operations.
-- Fail
-  - For the failed operations.
-
-In each directory you will also find many sub-categories where the sound effects have
-been classified, so that you can choose your favorites sound to make you sending operation a funny experience :sparkles:
-
-//Spiegare come importare i suoni
+We know that you need a little of a red plumber effect for your drone.
+We have the solution for you. Some of the most iconic sounds of one of the most popular
+and beloved video games of all time might be the perfect fit for your drones.
+Go and get your coin getting our drone! :moneybag: :1up: :mushroom: :fire: :star: :flag:
