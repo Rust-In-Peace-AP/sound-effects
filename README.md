@@ -14,3 +14,7 @@ We just wanted to make the things a little funnier adding some drone's version a
  - **QUACK** drone;
 
 So, if you wanna have a basic drone but with some funny feature, this is the one for you! :smirk:
+
+---
+
+Feel free to open an issue if you have a problem with our drone!!
