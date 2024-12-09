@@ -1,3 +1,9 @@
-./sounds/
+sounds/
 
-./.idea/
+**/.idea/
+
+.idea/
+
+**/target/
+
+**/Cargo.lock/
