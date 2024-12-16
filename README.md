@@ -4,7 +4,7 @@ In this repository you'll find some versions of our drone.
 
 You'll probably are thinking what are we meaning with "some versions".  
 Like, "Duh, we were meant to have just 1 impl" well, we liked to think a little outside the box.  
-We have **different**, but *equal* version of our drone. What makes them different are the, :drum: :drum: :drum:,  
+We have **different**, but *equal* version of our drone. What makes them different are the, :drum: :drum: :drum:
 **SOUND EFFECTS**.
 
 You'll find the instructions to import the drone that you want by clicking on the name of it:
