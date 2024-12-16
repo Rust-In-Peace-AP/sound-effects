@@ -1,0 +1,23 @@
+[package]
+name = "AmongUsDrone"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+wg_2024 = { git = "https://github.com/WGL-2024/WGL_repo_2024.git" , feature = ["debug", "serialize"] }
+crossbeam-channel = "0.5"
+rand = "0.8"
+rodio = "0.20.1"
+reqwest = { version = "0.12.9", features = ["blocking"] }
+
+
+[dev-dependencies]
+drone_tester = { git = "https://github.com/daw-dev/drone-tester.git" }
+
+[features]
+debug = ["wg_2024/debug"]
+serialize = ["wg_2024/serialize"]
+
+[lib]
+name = "ap2024_rustinpeace_amongusdrone"
+path = "src/lib.rs"
