@@ -1,6 +1,6 @@
-# Sound-effects
+# Sound-effects :flying_saucer:
 
-In this repository you'll find some versions of our drone. :flying_saucer:
+In this repository you'll find some versions of our drone. 
 
 You'll probably are thinking what are we meaning with "some versions".  
 Like, "Duh, we were meant to have just 1 impl" well, we liked to think a little outside the box.  
