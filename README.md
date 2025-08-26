@@ -18,3 +18,7 @@ You'll find the instructions to import the drone that you want by clicking on th
 ---
 
 If you find some problems feel free to open an issue on **THIS** repository if you have a problem with one of our drones!!
+
+---
+
+To understand more about the project look [here](https://github.com/WGL-2024/WGL_repo_2024)
